@@ -2,15 +2,19 @@ from tkinter import *
 
 from tkinter.ttk import *
 from typing import Any
-from queue import PriorityQueue
+from queue import *
+from collections import *
 
 class Task:
 
-    def __init__(self,taskName,taskPriority,taskTime):
+    def __init__(self,taskName,taskDescription,taskPriority,taskInterest,taskDifficulty):
         #taskName = self.acceptTask()
         self.taskName = taskName
+        self.taskDescription = taskDescription
         self.taskPriority = taskPriority
-        self.taskTime = taskTime
+        #self.taskTime = taskTime
+        self.taskInterest = taskInterest
+        self.taskDifficulty = taskDifficulty
         #self.printName(taskName)
 
 
@@ -24,9 +28,21 @@ class Task:
     
     def getName(self):
         return self.taskName
+    
+    def getDifficulty(self):
+        return self.taskDifficulty
+    
+    def getInterest(self):
+        return self.taskInterest
+
+    def getTaskPriority(self):
+        return self.taskPriority
+    
+    def getTaskDescription(self):
+        return self.taskDescription
 
 
-
+#will not work in its current state
 class TaskKeeper:
     #array = []
     def __init__(self,array,taskQueue):
@@ -88,23 +104,34 @@ class GUI:
     #frame = Frame(popup)
 
     taskCount = 0
+    completeTasks = 0 #counter for completed tasks
 
     taskFrame = Frame(popup,height = 335,width = 625, style = 'taskFrame.TFrame')
     listbox = Listbox(taskFrame,height = 335, width = 625, fg= 'red')
     toolFrame = Frame(popup,height= 335, width = 150, style='toolFrame.TFrame')
-    
+    resultFrame = Frame(popup,height = 75,width = 625, style = 'resultFrame.TFrame')
     s = Style()
+
+    taskList = []
+    
+    
     
     def __init__(self):
         print("using tkinter")
         #self.frame.pack()
         self.popup.geometry('800x600')
         self.popup.title('Uhh I am testing')
+        self.setUpFrames()
         self.setUpButtons()
         self.setUpLabels()
         self.taskDisplay()
         self.popup.mainloop()
-
+    
+    def setUpFrames(self):
+        self.toolFrame.place(x = 640, y = 20)
+        self.s.configure('toolFrame.TFrame')
+        self.resultFrame.place(x = 10, y = 370)
+        self.s.configure('resultFrame.TFrame',background = 'white')
 
     def setUpButtons(self):
         button = Button(self.popup,text='Stop',width=25,
@@ -114,16 +141,25 @@ class GUI:
                         command = self.acceptInputs)
         submitBtn.place(x = 712, y = 565)
 
-        self.toolFrame.place(x = 640, y = 20)
-        self.s.configure('toolFrame.TFrame', background ='grey')
-        clearBtn = Button(self.toolFrame,text="Clear", command=self.clearList)
-        clearBtn.pack(anchor= 'center',side = TOP)
+        
+        clearBtn = Button(self.toolFrame,text="Clear All", command=self.clearList)
+        clearBtn.place(x = 75, y = 40, anchor= 'center')
         fakeBtn1 = Button(self.toolFrame,text="Nothing",command=None)
-        fakeBtn1.pack(anchor='center',side = TOP )
+        fakeBtn1.place(x = 75, y = 100, anchor= 'center')
 
         removeBtn = Button(self.toolFrame,text="Remove Task", 
                                                 command=self.removeTask)
-        removeBtn.pack(anchor='center',side = TOP)
+        removeBtn.place(x = 75, y = 160, anchor= 'center')
+        completeBtn = Button(self.toolFrame,text="Complete Task",
+                                                command=self.completeTask)
+        completeBtn.place(x = 75, y = 220, anchor= 'center')
+
+        selectBtn = Button(self.toolFrame,text="Select Task", 
+                                                command = self.selectTask)
+        selectBtn.place(x = 75, y = 280, anchor='center')
+
+        testBtn = Button(self.resultFrame, text = "test",command = None)
+        testBtn.place( x= 543, y = 5)
 
         
         
@@ -172,6 +208,10 @@ class GUI:
         
         interestLvl['values'] = ('Cannot wait','Interested','Eh','Pls no','Oh dear God no')
         interestLvl.place(x = 395, y = 470)
+
+        taskResult = Label(self.resultFrame,text='Your resultant task is...')
+        taskResult.place(x = 0, y = 0)
+
     
     def taskDisplay(self):
         
@@ -191,12 +231,39 @@ class GUI:
 
     def clearList (self):
         self.listbox.delete(0,self.listbox.size())
+
+    
+    #maybe this should be to clear the resultFrame of its current task
+    def completeTask (self):
+        self.completeTask =+ 1
+        self.listbox.delete(self.listbox.curselection())
+    
+    def selectTask (self):
+        index = self.listbox.curselection()
+        nameLabel = Label(self.resultFrame,text='Name:',background='white')
+        nameLabel.place(x = 5, y = 20)
+        descLabel = Label(self.resultFrame,text='Description:',background='white')
+        descLabel.place(x = 5, y = 40)
+        taskResult = Label(self.resultFrame,text=self.listbox.get(index),background='white')
+        taskResult.place(x = 50, y = 20)
+        descResult = Label(self.resultFrame,
+                            text=self.findTask(self.listbox.get(index),
+                            self.taskList),background='white')
+        descResult.place(x = 79, y = 40)
+
+        self.listbox.delete(index)
+        
+        
+        
+    def findTask (self,name,array):
+        for task in array:
+            if task.getName() == name:
+                break
+        
+        return task.getTaskDescription()
         
 
-
-        
-
-    def acceptInputs(self):
+    def acceptInputs(self):        
 
         name = self.namevar.get()
         desc = self.descvar.get()
@@ -233,11 +300,19 @@ class GUI:
         elif inter == "Oh dear God no":
             inter = 1
 
+        task = Task(name,desc,prior,diff,inter)
+        self.taskList.append(task)
+
         print("task name: "+name)
+        #print(self.taskList[0].getName())
         print("description: "+desc)
         print("priority: "+str(prior))
         print("difficulty: "+str(diff)) 
         print("interest level: "+str(inter))
+
+        #just to see if i could get the tasks in the list
+        for task in self.taskList:
+            print(task.getName())
 
         self.taskCount += 1
 
@@ -250,19 +325,6 @@ class GUI:
         self.interest.set("")
 
 
-
-        
-
-
-
-        
-        
-
-
-
-        
-
-    
 
 #task1 = Task("do poop","0","2")
 #print(task1.taskName)
