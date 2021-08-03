@@ -4,6 +4,7 @@ from tkinter.ttk import *
 from typing import Any
 from queue import *
 from collections import *
+from random import *
 
 class Task:
 
@@ -108,7 +109,7 @@ class GUI:
 
     taskFrame = Frame(popup,height = 335,width = 625, style = 'taskFrame.TFrame')
     listbox = Listbox(taskFrame,height = 335, width = 625, fg= 'red')
-    toolFrame = Frame(popup,height= 335, width = 150, style='toolFrame.TFrame')
+    toolFrame = Frame(popup,height= 435, width = 150, style='toolFrame.TFrame')
     resultFrame = Frame(popup,height = 75,width = 625, style = 'resultFrame.TFrame')
     s = Style()
 
@@ -160,6 +161,10 @@ class GUI:
 
         testBtn = Button(self.resultFrame, text = "test",command = None)
         testBtn.place( x= 543, y = 5)
+
+        randomBtn = Button(self.toolFrame, text="Randomize", 
+                                                command=self.randomize)
+        randomBtn.place(x = 75, y = 367, anchor='center')
 
         
         
@@ -232,6 +237,27 @@ class GUI:
     def clearList (self):
         self.listbox.delete(0,self.listbox.size())
 
+    def randomize (self):
+        value = randint(0,len(self.taskList)-1)
+        selection = self.taskList[value]
+        #find a way to print to the gui
+        nameLabel = Label(self.resultFrame,text='Name:',background='white')
+        nameLabel.place(x = 5, y = 20)
+        descLabel = Label(self.resultFrame,text='Description:',background='white')
+        descLabel.place(x = 5, y = 40)
+        taskResult = Label(self.resultFrame,text=selection.getName(),background='white')
+        taskResult.place(x = 50, y = 20)
+        descResult = Label(self.resultFrame,
+                            text=self.findTask(selection.getTaskDescription(),
+                            self.taskList),background='white')
+        descResult.place(x = 79, y = 40)
+        
+
+        print("random stuff")
+        print(selection.getName())
+        self.taskList.pop(value)
+        self.listbox.delete(value)
+
     
     #maybe this should be to clear the resultFrame of its current task
     def completeTask (self):
@@ -250,7 +276,7 @@ class GUI:
                             text=self.findTask(self.listbox.get(index),
                             self.taskList),background='white')
         descResult.place(x = 79, y = 40)
-
+        #self.taskList.pop(index)
         self.listbox.delete(index)
         
         
