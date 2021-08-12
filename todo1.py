@@ -276,9 +276,16 @@ class GUI:
                             text=self.findTask(self.listbox.get(index),
                             self.taskList),background='white')
         descResult.place(x = 79, y = 40)
-        #self.taskList.pop(index)
-        self.listbox.delete(index)
+
+        #delete from the task list as well
         
+        for task in self.taskList:
+            
+            if task.getName() == self.listbox.get(index):
+                indexArr = self.taskList.index(task)
+                self.taskList.pop(indexArr)
+            
+        self.listbox.delete(index)
         
         
     def findTask (self,name,array):
