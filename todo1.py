@@ -145,7 +145,7 @@ class GUI:
         
         clearBtn = Button(self.toolFrame,text="Clear All", command=self.clearList)
         clearBtn.place(x = 75, y = 40, anchor= 'center')
-        fakeBtn1 = Button(self.toolFrame,text="Nothing",command=None)
+        fakeBtn1 = Button(self.toolFrame,text="Nothing",command=self.prioritySelect)
         fakeBtn1.place(x = 75, y = 100, anchor= 'center')
 
         removeBtn = Button(self.toolFrame,text="Remove Task", 
@@ -227,7 +227,6 @@ class GUI:
         
     def addToDisplay (self,taskCount,name):
         
-        
         self.listbox.insert(taskCount, name)
 
     def removeTask (self):
@@ -251,7 +250,6 @@ class GUI:
                             text=self.findTask(selection.getTaskDescription(),
                             self.taskList),background='white')
         descResult.place(x = 79, y = 40)
-        
 
         print("random stuff")
         print(selection.getName())
@@ -277,8 +275,8 @@ class GUI:
                             self.taskList),background='white')
         descResult.place(x = 79, y = 40)
 
-        #delete from the task list as well
-        
+        #delete from the task list as well --done below
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
         for task in self.taskList:
             
             if task.getName() == self.listbox.get(index):
@@ -287,7 +285,30 @@ class GUI:
             
         self.listbox.delete(index)
         
+    def prioritySelect (self):
+        tempTask = self.taskList[0]
+        index = 0
         
+        for task in self.taskList:
+            
+            if task.getTaskPriority() < tempTask.getTaskPriority():
+                tempTask = task
+            else: 
+                continue
+        
+        print(tempTask.getName())
+        indexArr = self.taskList.index(tempTask)
+        
+
+        #to remove from the listbox ..
+        for task in self.taskList:
+            if tempTask.getName() == self.listbox.get(index):
+                self.listbox.delete(index)
+            else:
+                index=+1
+
+        self.taskList.pop(indexArr)
+
     def findTask (self,name,array):
         for task in array:
             if task.getName() == name:
@@ -303,8 +324,8 @@ class GUI:
         prior = self.priority.get()
         if prior == "0 - High":
             prior = 0
-        elif prior == "1 - Mid":
-            prior = 1
+        elif prior == "1 - Mid":                                   
+            prior = 1                                                 
         elif prior == "2 - Low":
             prior = 2
         elif prior == "3 - Eh":
